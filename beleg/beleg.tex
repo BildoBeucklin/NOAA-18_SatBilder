@@ -1,0 +1,65 @@
+\documentclass[12pt,a4paper]{scrartcl}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{fancyref}
+\usepackage[ngerman]{babel}
+\usepackage{times}
+\usepackage{listings}
+
+
+
+
+
+\title{Empfangen von Satellitenbildern durch RTL SDR} 
+\author{\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+  Moritz Lechner\\
+  Konstantin Ro\ss mann\\
+  Leon Sobotta\\\\
+  Seminar Advanced Computer Systems\\
+  Computer Engineering
+}
+
+
+\date{\today}
+
+
+\begin{document}
+
+
+\maketitle
+
+\pagebreak
+
+\tableofcontents
+\listoffigures	
+
+\pagebreak
+
+
+\section{Einleitung}
+
+
+Wir machen zeug.
+
+\section{Technik}
+
+F"ur RTL-SDR Projekte werden DVB-T  (Digital Video Broadcasting Terrestrial) Antennen verwendet, welche dann "uber einen USB Dongle mit dem PC verbunden werden \cite{rtlsdr.com}. Der Dongle basiert auf dem RTL2832U Chip, welcher von Realtek entwickelt wird, dieser ist ein leistungsstarker DVB-T Empfangsgleichrichter \cite{realtek}. Mit einem individuell daf"ur entwickelten Treiber k"onnen die Rohdaten im Chip ausgelesen werden. Dabei hat er eine stabile Samplerate von 2,56 MS/s und eine maximale Samplerate von 3,2 MS/s. Bei letzterer k"onnen allerdings einige Samples verloren gehen. Er arbeitet mit einer Aufl"osung von 8 Bits. Dabei weist er eine Eingangsimpedanz von 75 Ohm, bzw. 50 Ohm bei neueren Versionen mit SMA Anschluss. Der RTL-SDR kann Frequenzen zwischen 22 und 2200 MHz verarbeiten \cite{rtlsdr.com}. Das ist besonders wichtig, da der NOAA-18 \footnote{National Oceanic and Atmospheric Administration} Satellit, dessen Signale wir empfangen wollen, mit 137,9125 MHz funkt. Der Satellit befindet sich in einer H"ohe von 854 km und hat damit eine Umlaufzeit von 102 Minuten \cite{osp.noaa}.
+
+\pagebreak
+
+\section{Versuchsbeschreibung}
+
+\section{Versuchsdurchf"uhrung}
+\subsection{Ergebnisse}
+\section{Fazit}
+
+\pagebreak
+
+\bibliographystyle{acm}
+\bibliography{literatur}
+
+
+\end{document}
+

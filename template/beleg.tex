@@ -1,0 +1,184 @@
+\def\papertitle{Empfangen von Wettersatellitenbildern durch RTL-SDR}
+\def\paperauthorA{Moritz Lechner}
+\def\paperauthorB{Konstantin Roßmann}
+\def\paperauthorC{Leon Sobotta}
+
+\documentclass[twoside,a4paper]{article}
+\usepackage{etoolbox}
+\usepackage{acs}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{euscript}
+%\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+%\usepackage[T1]{fontenc}
+%\usepackage{lmodern}
+\usepackage{nimbusserif}
+\usepackage{ifpdf}
+\usepackage[english]{babel}
+\usepackage{caption}
+\usepackage{subfig} % or can use subcaption package
+\usepackage{color}
+
+\input glyphtounicode
+\pdfgentounicode=1
+
+\setcounter{page}{1}
+\ninept
+
+\newcounter{numauth}\setcounter{numauth}{1}
+\newcounter{listcnt}\setcounter{listcnt}{1}
+\newcommand\authcnt[1]{\ifdefined#1 \stepcounter{numauth} \fi}
+
+\newcommand\addauth[1]{
+\ifdefined#1 
+\stepcounter{listcnt}
+\ifnum \value{listcnt}<\value{numauth}
+\appto\authorslist{, #1}
+\else
+\appto\authorslist{~and~#1}
+\fi
+\fi}
+
+\authcnt{\paperauthorB}
+\authcnt{\paperauthorC}
+
+
+\def\authorslist{\paperauthorA}
+\addauth{\paperauthorB}
+\addauth{\paperauthorC}
+
+
+
+\usepackage{times}
+
+\newif\ifpdf
+\ifx\pdfoutput\relax
+\else
+   \ifcase\pdfoutput
+      \pdffalse
+   \else
+      \pdftrue
+\fi
+
+\ifpdf % compiling with pdflatex
+  \usepackage[pdftex,
+    pdftitle={\papertitle},
+    pdfauthor={\authorslist},
+    pdfsubject={Empfangen von Wettersatellitenbildern durch RTL-SDR},
+    colorlinks=false, % links are activated as color boxes instead of color text
+    bookmarksnumbered, % use section numbers with bookmarks
+    pdfstartview=XYZ % start with zoom=100% instead of full screen; especially useful if working with a big screen :-)
+  ]{hyperref}
+  \pdfcompresslevel=9
+  \usepackage[pdftex]{graphicx}
+ %\usepackage[figure,table]{hypcap}
+\else % compiling with latex
+  \usepackage[dvips]{epsfig,graphicx}
+  \usepackage[dvips,
+    pdftitle={\papertitle},
+    pdfauthor={\authorslist},
+    pdfsubject={Empfangen von Wettersatellitenbildern durch RTL-SDR},
+    colorlinks=false, % no color links
+    bookmarksnumbered, % use section numbers with bookmarks
+    pdfstartview=XYZ % start with zoom=100% instead of full screen
+  ]{hyperref}
+  % hyperrefs are active in the pdf file after conversion
+  %\usepackage[figure,table]{hypcap}
+\fi
+\usepackage[hypcap=true]{caption}
+\title{\papertitle}
+
+\begin{document}
+% more pdf-tex settings:
+\ifpdf % used graphic file format for pdflatex
+  \DeclareGraphicsExtensions{.png,.jpg,.pdf}
+\else  % used graphic file format for latex
+  \DeclareGraphicsExtensions{.eps}
+\fi
+
+
+\maketitle
+
+\begin{abstract}
+
+Die Daten die Wettersatelliten zur Erde senden, können von jedem mit der richtigen Hard- und Software empfangen werden. Um eine simple und kostengünstige Methode zu testen, wurden für diese Versuchsreihe ein RTL-SDR Stick in Kombination mit einer selbstgebauten QFH-Antenne verwendet, um Bilder des NOAA-18 Satelliten zu empfangen. Diese Methode erwies sich als erfolgreich beim Empfang von Daten, allerdings scheiterte sie bei der anschließenden Dekodierung der empfangenen Bilder. Die Audiodaten sind zu verrauscht, so dass kein Bild daraus generiert werden kann.
+
+\end{abstract}
+
+\section{Einleitung}
+\label{sec:einleitung}
+ 
+In dieser Seminararbeit werden Versuche zum Empfangen von Daten von Wettersatelliten mithilfe von RTL-SDR Komponenten unternommen und ausgewertet. Die Daten sollen mit Antennen empfangen werden, die für Laien erhältlich sind, um zu zeigen, dass mithilfe der SDR-RTL Technik auch größere Projekte ohne viel Vorwissen oder professioneller Hard- und Software möglich sind.\\
+
+\noindent So wäre zum Beispiel kleineren Unternehmen oder Privatpersonen die Möglichkeit gegeben, eigene Satellitendaten zu empfangen und damit unabhängiger von großen Konzernen zu sein. Des Weiteren ist es ein Interessanter und vergleichsweise simpler Versuchsaufbau mit dem Anfänger an das Thema Funktechnik herangeführt werden können. 
+
+\section{Versuchseinführung}
+\label{sec:technik}
+
+SDR steht für Software Defined Radio und wird als "Radio Kommunikationssystem, welches Software zur Modulation und Demodulation von Radiosignalen nutzt" \cite{sciencedirect_garg} beschrieben. Es ist in der Lage unterschiedlichste Arten der Signalverarbeitung zu erledigen, indem die Software verändert und angepasst wird \cite{sciencedirect_garg}. Das ist einer der Vorteile von SDR im Vergleich zu analogen Gegenstücken. Ein weiterer positiver Aspekt ist, dass solche Systeme sehr leistungsfähig sind, wobei die verwendbaren Frequenzen durch ADCs \footnote{Analog Digital Converter} limitiert werden \cite{seeedstudio}. Typische Einsatzbereiche für SDR sind zum Beispiel das Empfangen von Rundfunk Radio, Amateur Funk, das Verfolgen von Schiffen und Flugzeugen und mehr. \\
+
+\noindent Für RTL-SDR Projekte werden DVB-T  (Digital Video Broadcasting Terrestrial) Antennen verwendet, welche dann über einen USB Dongle mit dem PC verbunden werden \cite{rtlsdr.com}. Der Dongle basiert auf dem RTL2832U Chip, einem leistungsstarken DVB-T Empfangsgleichrichter, welcher von Realtek entwickelt wird \cite{realtek}. Mit einem individuell dafür entwickelten Treiber können die Rohdaten im Chip ausgelesen werden. Dabei hat er eine stabile Samplerate von 2,56 MS/s und eine maximale Samplerate von 3,2 MS/s. Bei Letzterer können allerdings einige Samples verloren gehen. Er arbeitet mit einer Auflösung von 8 Bits. Dabei weist er eine Eingangsimpedanz von 75 Ohm, bzw. 50 Ohm bei neueren Versionen mit SMA Anschluss. Der RTL-SDR kann Frequenzen zwischen 22 und 2200 MHz verarbeiten \cite{rtlsdr.com}. Das ist besonders wichtig, da der NOAA-18 \footnote{National Oceanic and Atmospheric Administration} Satellit, dessen Signale wir empfangen wollen, mit 137,9125 MHz funkt. Der Satellit befindet sich in einer Höhe von 854 km und hat damit eine Umlaufzeit von 102 Minuten \cite{osp.noaa}.\\
+
+\noindent Die Dipol-Antenne ist eine der einfachsten Antennen. Sie besteht, wie der Name schon sagt, aus zwei stromdurchflossenen Drähten an deren Spitze sich durch das magnetische Feld eine Ladung, sowie ein elektrisches Feld. Die perfekte Länge des Dipols ist dabei Lambda/2, also der Hälfte der Wellenlänge \cite{dipol}.
+
+\section{Versuchsaufbau}
+\label{sec:versuchsaufbau}
+
+Für den Versuchsaufbau wird ein RTL-SDR Stick benötigt, sowie eine Antenne. Es wurde ein Versuch mit einer QFH-Antenne und einer Dipol-Antenne, wie sie auch für DVB-T benutzt wird, vorbereitet. Der RTL-SDR Stick muss vor der Verwendung noch mit den nötigen Treibern überschrieben werden, damit die empfangenen Daten von einem Computer verarbeitet werden können. An Software wurde zur Aufnahme SDRSharp \cite{sdrsharp}  und SDR Console \cite{sdr.console} benutzt, SDR Console wurde auch zur Lokalisierung des Satelliten benutzt. Die aufgenommenen Signale werden als Audiospur aufgenommen und müssen noch dekodiert werden. Dafür wurde das Programm WXtoimg benutzt, welches zum Zeitpunkt des Versuches schon nicht mehr weiterentwickelt oder vom Hersteller unterstützt wurde. Daher mussten Dateien dort händisch aktualisiert werden. \\
+
+\noindent Die Dipol-Antenne ist vom Hersteller Aplic und unterstützt einen Frequenzbereich von 174-230 MHZ, was nicht den optimalen Werten entspricht, aber sie war bereits in unserem Lagerbestand vorhanden und hat einen geringen Kaufpreis. Die QFH-Antenne wurde für den Versuch extra angefertigt und genau auf die Frequenz 137.5 MHz eingestellt \cite{qfh.instruc}. Für die Berechnung der Länge der Leiter sowie Biegeradius haben wir ein Online-Tool verwendet \cite{qfh.design}.\\
+
+\begin{figure}[h]
+	 \centering
+	 \includegraphics[width=0.5\textwidth]{src/qhf-antenne-design.png}
+	 \caption{QFH Antenne - schematische Zeichnung und Tabelle mit Maßen \cite{qfh.design}}
+\end{figure}
+
+Für die Antenne wurden nur Bauteile aus dem Baumarkt verwendet und dabei wurde auch der Kostenfaktor berücksichtigt. Das vertikale Rohr ist ein PVC-Abflussrohr mit einem Durchmesser von 40 mm die vertikalen Rohre bestehen aus Kabelrohren mit einem Durchmesser von 15 mm. Die Leiter sind einfache 1,5 mm mehradrige Kupferkabel, wobei ein höherer Kabelquerschnitt und nur ein ein-adriges Kabel die Biegungen stabiler machen würde. Die außen Kabel sind jeweils um die Hälfte verdreht und die Antenne hat ein Breiten/Höhen Verhältnis von 0,44.\\
+
+\noindent Nach dem die Antennen einsatzbereit sind, werden sie über ein Koaxialkabel mit den RTL-SDR Stick verbunden. Nun werden die Antennen auf einer möglichst freien Fläche positioniert. 
+
+\section{Versuchsdurchführung}
+\label{sec:versuchsdurchführung}
+
+Zunächst wurde die Dipol-Antenne getestet, bei dieser wurden von Anfang an keine optimistischen Erwartungen gehegt, da die Antenne nur als temporärer Ersatz während der Konstruktion der deutlich leistungsfähigeren QFH-Antenne dienen sollte. Die Dipol-Antenne erwies sich jedoch als nützlich, um die Funktionalität der benutzten Software und Hardware zu verifizieren. Die empfangenen Daten waren wie erwartet von sehr schlechter Qualität. Dies hatte mehrere offensichtliche Ursachen. Zum einen fand der Test inmitten von Berlin statt, wo aufgrund der hohen Bebauung und der zahlreichen Störsignale nur mit idealem Empfangsgerät die schwachen Signale der NOAA-Satelliten empfangen werden können. Zum anderen war die Antenne nicht für den in diesem Versuch angestrebten Frequenzbereich geeignet. Dies war allerdings bereits vor der Durchführung des Versuchs bekannt und wurde in Kauf genommen. \\
+
+\begin{figure}[htbp!]
+	 \centering
+	 \includegraphics[width=0.4\textwidth]{src/versuch.jpeg}
+	 \caption{Versuchsaufbau für den Signalempfang}
+\end{figure}
+
+\noindent Der deutlich vielversprechendere Versuch mit der QFH-Antenne hat von Beginn an merklich bessere Ergebnisse gezeigt, da die Bedingungen für die Signalaufnahme deutlich verbessert wurden. Die Signale wurden nun nicht mehr in Berlin, sondern auf einer freien Fläche in Brandenburg ohne Störsignale empfangen. Zudem wurde nun eine Antenne verwendet, die für den genau angestrebten Frequenzbereich konzipiert worden war. Während des Überflugs des Satelliten, welcher mit Orbitron vorhergesagt und nachverfolgt werden konnte, waren auf dem Spektrumanalysator von SDRSharp die erwarteten Ausschläge deutlich zu erkennen, die während der gesamten Überflugszeit aufgezeichnet und zur weiteren Verarbeitung gespeichert wurden. Anschließend wurden die aufgezeichneten Signale in Wxtoimg dekodiert. Erwartet wurde ein aktuelles Satellitenbild von Europa, leider war jedoch aufgrund von zu starker Rauschintensität nichts zu erkennen. 
+
+
+
+\section{Ergebnisse}
+\label{sec:ergebnisse}
+
+In diesem Experiment wurden zwei verschiedene Antennentypen untersucht: die Dipol-Antenne und die Querprofil-Hohlleiterantenne (QFH-Antenne). Die Dipol-Antenne wurde als temporärer Ersatz während der Konstruktion der QFH-Antenne verwendet und erwies sich als nützlich, um die Funktionalität der verwendeten SDR-Software und Hardware zu verifizieren. Die empfangenen Daten waren jedoch von sehr schlechter Qualität, was auf die ungünstigen Testbedingungen inmitten von Berlin und die ungeeignete Antenne für den angestrebten Frequenzbereich zurückzuführen war. Die Dipol-Antenne war beispielsweise nicht für den im Versuch angestrebten Frequenzbereich konzipiert und daher nicht in der Lage, die Signale effektiv aufzunehmen. \\
+
+
+
+	
+\noindent Der Versuch mit der QFH-Antenne zeigte dagegen merklich bessere Ergebnisse. Dies war hauptsächlich auf die Verbesserung der Signalaufnahmebedingungen zurückzuführen, da die Antenne nun auf einer freien Fläche ohne Störsignale in Brandenburg empfangen wurde. Zudem war die QFH-Antenne für den genau angestrebten Frequenzbereich konzipiert worden, was sich positiv auf die Empfangsleistung auswirkte. Die Länge der QFH-Antenne muss genau auf die gewünschte Frequenz abgestimmt sein, um die Signale effektiv aufnehmen zu können. Während des Überflugs des Satelliten konnten auf dem Spektrumanalysator von SDRSharp die erwarteten Ausschläge deutlich erkannt werden, die während der gesamten Überflugszeit aufgezeichnet und zur weiteren Verarbeitung gespeichert wurden. Leider konnten die aufgezeichneten Signale aufgrund von zu starker Rauschintensität nicht erfolgreich in Wxtoimg dekodiert werden.
+
+
+
+\section{Fazit}
+\label{sec:fazit}
+
+Nach Durchführung dieses Experiments lässt sich feststellen, dass die Wahl der richtigen Antenne und die Verbesserung der Signalaufnahmebedingungen entscheidend für den Erfolg beim Empfang von Satellitensignalen sind. Der Versuch mit der Dipol-Antenne, die nicht für den angestrebten Frequenzbereich geeignet war und in ungünstigen Bedingungen durchgeführt wurde, lieferte wie zu erwarten sehr schlechte Ergebnisse. Dagegen zeigte der Versuch mit der QFH-Antenne, deutlich vielversprechendere Ergebnisse. Obwohl die aufgezeichneten Signale aufgrund von zu starker Rauschintensität nicht erfolgreich dekodiert werden konnten, verdeutlicht dieses Experiment die Wichtigkeit der Wahl der richtigen Antenne und der Verbesserung der Signalaufnahmebedingungen beim Empfang von Satellitensignalen. \\
+
+\noindent Es ist grundsätzlich möglich, mit einer selbstgebauten Antenne und einem RTL-SDR-fähigen Stick Satellitenbilder zu empfangen, allerdings stellen die technischen Kenntnisse und die notwendige Konfigurierung der Software für Laien eine Herausforderung dar. Auch der Bau der QFH-Antenne erfordert das nötige Werkzeug und grundlegendes Wissen über die Funktionsweise solcher Antennen, um die richtigen Kabel auszuwählen und korrekt zu verlöten. Insgesamt ist es für Laien schwierig, ohne umfangreiche technische Kenntnisse und fortgeschrittene Fähigkeiten in der Konfiguration von Software erfolgreich Satellitenbilder zu empfangen. Auch wenn es möglich ist, ist es für die meisten Menschen wahrscheinlich einfacher und zuverlässiger, auf professionelle Ausrüstung und Dienstleistungen zurückzugreifen, um Satellitenbilder zu empfangen.
+
+
+%\newpage
+\nocite{*}
+\bibliographystyle{IEEEbib}
+\bibliography{literatur} % requires file literatur.bib
+
+
+
+\end{document}
